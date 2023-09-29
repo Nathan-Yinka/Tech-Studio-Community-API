@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from .models import JobPost,Skill,JobPoster
-from .serializers import JobPostSerializer,SkillSerializer,JobPosterSerializer,JobListSerializer
+from .models import JobPost,Skill,JobPoster,Tool
+from .serializers import JobPostSerializer,SkillSerializer,JobPosterSerializer,JobListSerializer,ToolSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
@@ -67,12 +67,25 @@ class SkillCreateView(generics.CreateAPIView):
         if email:
             client_created = True
         serializer.save(client_created=client_created)
+        
+class ToolCreateView(generics.CreateAPIView):
+    queryset = Tool.objects.all()
+    serializer_class = ToolSerializer
+    
+    def perform_create(self, serializer):
+        email = serializer.validated_data.get("email")
+        client_created = serializer.validated_data.get("client_created")
+        if email:
+            client_created = True
+        serializer.save(client_created=client_created)
             
 class DropDownItem(APIView):
     def get(self, request, *args, **kwargs):
         email = request.query_params.get("email")
         skills = Skill.objects.filter(Q(email=None) | Q(email=email))
+        tools = Tool.objects.filter(Q(email=None) | Q(email=email))
         skills = SkillSerializer(instance=skills, many=True)
+        tools = ToolSerializer(instance=tools, many=True)
         
-        dropdown_items ={"deadline_choices":deadline_choices,'job_type':job_type,'job_experiences':job_experiences,"jobposts_pays":jobposts_pays,"skills":skills.data}
+        dropdown_items ={"deadline_choices":deadline_choices,'job_type':job_type,'job_experiences':job_experiences,"jobposts_pays":jobposts_pays,"skills":skills.data,"tools":tools.data}
         return Response(dropdown_items)
