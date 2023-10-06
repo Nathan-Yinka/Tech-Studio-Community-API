@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Superuser Upload Form</title>
+</head>
+<body>
+    <h2>Superuser Upload Form</h2>
+    {% if messages %}
+    <ul class="messages">
+    {% for message in messages %}
+      <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Upload</button>
+    </form>
+
+    {% if method %}
+    <div>
+        <h3>List of Duplicate Mail in List</h3>
+        <ul>
+            {% for mail in duplicate_email %}
+            <li>{{ mail }}</li>
+            {% empty %}
+            <p>
+                No duplicate found
+            </p>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</body>
+</html>

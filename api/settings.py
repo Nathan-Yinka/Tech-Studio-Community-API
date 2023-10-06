@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     
     # install apps
     "jobs.apps.JobsConfig",
+    "users.apps.UsersConfig",
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -60,7 +62,7 @@ ROOT_URLCONF = 'api.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/"templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,3 +128,28 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+AUTH_USER_MODEL = 'users.User'
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ]
+}
+
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = "api.backend.EmailBackend"
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'nathanace12345@gmail.com'
+EMAIL_HOST_PASSWORD = 'rtcvtzkapqxwwejb'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+# from django.core.mail import send_mail
+# send_mail('Django mail',"This e-mail was sent with Django",'nathanace12345@gmail.com',["oludarenathaniel@gmail.com"],fail_silently=False)
