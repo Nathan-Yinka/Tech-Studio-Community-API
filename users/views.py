@@ -7,21 +7,12 @@ from api.permissions import IsOwnerOrReadOnly,IsStaffOrReadOnly
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model,authenticate
 from .serializers import CustomUserSerializer,UserLoginSerializer,CommumitySerializer
-from .models import Community,EmailConfirmationToken
+from .models import Community,EmailConfirmationToken,AllowedEmail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.core.mail import send_mail
-from django.contrib.auth import get_user_model
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.sites.shortcuts import get_current_site
-from django.urls import reverse
-from django.utils.http import urlsafe_base64_encode
-from rest_framework import generics
-from rest_framework.response import Response
-from rest_framework import status
-from .models import EmailConfirmationToken
 from django.core import signing
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from django.http import Http404
@@ -36,6 +27,11 @@ class UserRegistrationView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         email = request.data.get("email")
+        allowed_mail = AllowedEmail.objects.filter(email=email).first()
+
+        if allowed_mail is None:
+            return Response({"message": "You are not allowed to register because you are not an alumnus of Tech Studio Academy."},status=status.HTTP_403_FORBIDDEN)
+
         existing_user = User.objects.filter(email=email).first()
 
         if existing_user:
@@ -44,7 +40,7 @@ class UserRegistrationView(generics.CreateAPIView):
             else:
                 send_confirmation_email(existing_user,request)
 
-                return Response({'message': 'An account with this email address already exists but is not yet active. We have sent you a confirmation link.'}, status=status.HTTP_202_ACCEPTED)
+                return Response({'message': 'An account with this email address already exists but is not yet active. We have sent you a confirmation link. \n\n will expire in 5 mintues.'}, status=status.HTTP_202_ACCEPTED)
 
         if serializer.is_valid():
             user = serializer.save(is_active=False)
@@ -52,11 +48,10 @@ class UserRegistrationView(generics.CreateAPIView):
             # Generate a confirmation token
             send_confirmation_email(user,request)
 
-            return Response({'message': 'Registration successful. Check your email for a confirmation link.'}, status=status.HTTP_201_CREATED)
+            return Response({'message': 'Registration successful. Check your email for a confirmation link. \n\n will expire in 5 mintues.'}, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    
+   
 class EmailConfirmationView(generics.GenericAPIView):
     permission_classes = [AllowAny]
     def get(self, request, uid, token):

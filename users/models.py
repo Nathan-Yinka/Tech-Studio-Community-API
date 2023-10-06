@@ -2,6 +2,14 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.contrib.auth.models import Group, Permission
 import uuid
+from django.utils import timezone
+
+
+class AllowedEmail(models.Model):
+    email = models.EmailField(unique=True)
+    
+    def __str__(self):
+        return self.email
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -68,7 +76,6 @@ class Community(models.Model):
     
     def __str__(self):
         return self.name
-    
     
     
     

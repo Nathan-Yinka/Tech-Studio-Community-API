@@ -1,6 +1,7 @@
 from django.urls import path
 from django.contrib.auth import get_user_model
 from . import views
+from . import allowed_users
 
 app_name = "user"
 urlpatterns = [
@@ -13,4 +14,7 @@ urlpatterns = [
     path('user/<int:pk>/', views.UserDetailView.as_view(), name='user-detail'),
     
     path("community/",views.CommunityListView.as_view(), name = "community-list"),
+    
+    # user upload endpoint
+    path('allowed-users-upload/', allowed_users.superuser_upload_view, name="allowed-users-upload"),
 ]
