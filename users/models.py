@@ -40,8 +40,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     community = models.ForeignKey("Community", on_delete=models.SET_NULL, null=True)
-    image = models.ImageField(null=True,blank=True)
-    
+    image = models.ImageField(upload_to='user_profile_pic',null=True,blank=True)
+        
     groups = models.ManyToManyField(
         Group,
         verbose_name='groups',
