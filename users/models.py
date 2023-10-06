@@ -7,6 +7,7 @@ from django.utils import timezone
 
 class AllowedEmail(models.Model):
     email = models.EmailField(unique=True)
+    created = models.DateTimeField(default=timezone.now)
     
     def __str__(self):
         return self.email
@@ -64,7 +65,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
     
     class Meta:
-        unique_together = ('email', 'is_active')  # Add this line
+        unique_together = ('email', 'is_active') 
     
 class EmailConfirmationToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

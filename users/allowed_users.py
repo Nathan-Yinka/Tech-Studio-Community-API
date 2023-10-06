@@ -31,8 +31,9 @@ def superuser_upload_view(request):
                         for email in file:
                             try:
                                 email = email.decode('utf-8').strip()  # Convert bytes to string and remove whitespace
-                                allowed_mail = AllowedEmail.objects.create(email=email)
-                                allowed_mail.save()
+                                if email:
+                                    allowed_mail = AllowedEmail.objects.create(email=email)
+                                    allowed_mail.save()
                             except Exception as e:
                                 if "UNIQUE constraint failed" in str(e):
                                     duplicate_email.append(email)
