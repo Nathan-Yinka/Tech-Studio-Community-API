@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+import dj_database_url
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,9 +52,11 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     
     "storages",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -102,6 +108,12 @@ DATABASES = {
     }
 }
 
+database_url = os.environ.get("DATABASE_URL")
+db_from_env = dj_database_url.config(default=database_url)
+
+DATABASES = {
+    'default': db_from_env
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -195,3 +207,30 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS= [
     
 ]
+
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWS_ORIGINS = [
+    "http://localhost:5500",
+    "https://video-recording-api.onrender.com/videos/",
+    "https://helpmeoo.netlify.app/",
+    "https://malzahra.tech",
+]
+
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
+]
+
+CORS_ALLOW_HEADERS = [
+    "Accept",
+    "Content-Type",
+    "Authorization",
+]
+
+CORS_ALLOW_CREDENTIALS = True
