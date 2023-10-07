@@ -10,7 +10,7 @@ easy-colors==0.0.1
 idna==3.4
 itsdangerous==2.1.2
 jmespath==1.0.1
-Pillow==10.0.1
+Pillow
 psycopg2-binary==2.9.9
 python-dateutil==2.8.2
 python-resize-image==1.1.20
