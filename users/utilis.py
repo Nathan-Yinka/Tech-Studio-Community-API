@@ -4,6 +4,8 @@ from django.core.mail import send_mail
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from django.contrib.auth.tokens import default_token_generator
 from django.urls import reverse
+from django.template.loader import render_to_string
+from django.conf import settings
 
 def send_confirmation_email(user, request):
     
@@ -16,7 +18,7 @@ def send_confirmation_email(user, request):
 
         token = default_token_generator.make_token(user)
         
-        serializer = URLSafeTimedSerializer('your-secret-key') 
+        serializer = URLSafeTimedSerializer(settings.SECRET_KEY) 
         
         signed_token = serializer.dumps({'token': token})
         signed_user_id = serializer.dumps({'user_id': user.id})
@@ -31,12 +33,23 @@ def send_confirmation_email(user, request):
         confirmation_link = reverse('user:confirm-email', kwargs=token_data)
         confirmation_url = request.build_absolute_uri(confirmation_link)
 
-        subject = "Confirm Your Email Address"
-        message = f"Click the link below to confirm your email address:\n\n{confirmation_url}"
-        from_email = "noreply@example.com"
-        recipient_list = [user.email]
+        # subject = "Confirm Your Email Address"
+        # message = f"Click the link below to confirm your email address:\n\n{confirmation_url}"
+        # from_email = "techstudioacademy@technologynathan.com"
+        # recipient_list = [user.email]
         
-        send_mail(subject, message, from_email, recipient_list)
+        subject = "Confirm Your Email Address"
+        context = {'confirmation_link': confirmation_url}
+
+        # Load and render the HTML template
+        html_message = render_to_string('confirmation_email.html', context)
+
+        from_email = "techstudioacademy@technologynathan.com"
+        recipient_list = [user.email]
+
+        send_mail(subject, '', from_email, recipient_list, html_message=html_message, fail_silently=False)
+        
+        # send_mail(subject, message, from_email, recipient_list,fail_silently=False)
         
     except Exception as e:
         print(e)

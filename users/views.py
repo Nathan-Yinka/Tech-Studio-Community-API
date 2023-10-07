@@ -17,6 +17,7 @@ from django.core import signing
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from django.http import Http404
 from .utilis import send_confirmation_email
+from django.conf import settings
 
 User = get_user_model()
 
@@ -57,7 +58,7 @@ class EmailConfirmationView(generics.GenericAPIView):
     def get(self, request, uid, token):
         try:
             
-            serializer = URLSafeTimedSerializer('your-secret-key')
+            serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
             data = serializer.loads(uid, max_age=172800)
             uid = data['user_id']
 
@@ -134,7 +135,7 @@ class ResendConfirmationEmailView(APIView):
     def post(self, request):
         try:
             id = request.data.get('uid')
-            serializer = URLSafeTimedSerializer('your-secret-key')
+            serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
             data = serializer.loads(id, max_age=172800)
             uid = data['user_id']
         except:
