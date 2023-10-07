@@ -40,3 +40,4 @@ def send_confirmation_email(user, request):
         
     except Exception as e:
         print(e)
+        

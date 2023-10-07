@@ -4,5 +4,6 @@ djangorestframework==3.14.0
 easy-colors==0.0.1
 itsdangerous==2.1.2
 Pillow==10.0.1
+psycopg2-binary==2.9.9
 pytz==2023.3.post1
 sqlparse==0.4.4

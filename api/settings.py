@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,10 +46,13 @@ INSTALLED_APPS = [
     "jobs.apps.JobsConfig",
     "users.apps.UsersConfig",
     'rest_framework.authtoken',
+    
+    "storages",
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -84,6 +88,17 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'tech studio community',
+        'USER': 'postgres',
+        'PASSWORD': '1234',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -153,3 +168,29 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 # from django.core.mail import send_mail
 # send_mail('Django mail',"This e-mail was sent with Django",'nathanace12345@gmail.com',["oludarenathaniel@gmail.com"],fail_silently=False)
+
+
+# Set AWS S3 settings
+AWS_ACCESS_KEY_ID = 'AKIA5RG5QZFMMCGES4MN'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 's3buckettechstudio'
+AWS_S3_SIGNATURE_NAME = 's3v4', 
+AWS_S3_REGION_NAME = 'us-east-1'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL =  None
+AWS_S3_VERITY = True
+# AWS_DEFAULT_ACL = 'public-read'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+
+# using amazon s3 bucket
+# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS= [
+    
+]

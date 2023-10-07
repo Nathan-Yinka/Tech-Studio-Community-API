@@ -7,6 +7,7 @@ from django.utils import timezone
 
 class AllowedEmail(models.Model):
     email = models.EmailField(unique=True)
+    created = models.DateTimeField(default=timezone.now)
     
     def __str__(self):
         return self.email
@@ -39,8 +40,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     community = models.ForeignKey("Community", on_delete=models.SET_NULL, null=True)
-    image = models.ImageField(null=True,blank=True)
-    
+    image = models.ImageField(upload_to='user_profile_pic',null=True,blank=True)
+        
     groups = models.ManyToManyField(
         Group,
         verbose_name='groups',
@@ -64,7 +65,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
     
     class Meta:
-        unique_together = ('email', 'is_active')  # Add this line
+        unique_together = ('email', 'is_active') 
     
 class EmailConfirmationToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
