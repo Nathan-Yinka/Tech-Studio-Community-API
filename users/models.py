@@ -72,6 +72,11 @@ class EmailConfirmationToken(models.Model):
     token = models.CharField(max_length=200, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
+class PasswordResetConfirmationToken(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=200, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
 class Community(models.Model):
     name = models.CharField(max_length=100)
     
