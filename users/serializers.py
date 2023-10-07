@@ -40,7 +40,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         if value:
             # Resize the image to 200x200 pixels
             img = Image.open(value)
-            img = resizeimage.resize_thumbnail(img, [400, 400])
+            img = resizeimage.resize_thumbnail(img, [500, 500])
 
             # Save the resized image back to the same field
             value.seek(0)  # Make sure the file is at the beginning
@@ -58,3 +58,11 @@ class CommumitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Community
         fields = "__all__"
+        
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    new_password = serializers.CharField(write_only=True, required=True)

@@ -10,6 +10,9 @@ urlpatterns = [
     path("resend-confimation/",views.ResendConfirmationEmailView.as_view(),name="resend-confimation"),
     path("login/",views.UserLoginView.as_view(), name = "user-list"),
     
+    path("reset-password/",views.PasswordResetRequestView.as_view(),name='reset-password'),
+    path("confirm-password-reset/",views.PasswordResetConfirmView.as_view(),name="confirm-password-reset"),
+    
     path("users/",views.UserListView.as_view(), name = "user-list"),
     path('user/<int:pk>/', views.UserDetailView.as_view(), name='user-detail'),
     

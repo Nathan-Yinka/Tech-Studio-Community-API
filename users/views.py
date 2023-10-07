@@ -6,8 +6,8 @@ from rest_framework.permissions import AllowAny,IsAuthenticated,IsAdminUser
 from api.permissions import IsOwnerOrReadOnly,IsStaffOrReadOnly
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model,authenticate
-from .serializers import CustomUserSerializer,UserLoginSerializer,CommumitySerializer
-from .models import Community,EmailConfirmationToken,AllowedEmail
+from .serializers import CustomUserSerializer,UserLoginSerializer,CommumitySerializer,PasswordResetRequestSerializer,PasswordResetConfirmSerializer
+from .models import Community,EmailConfirmationToken,AllowedEmail,PasswordResetConfirmationToken
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
@@ -16,7 +16,7 @@ from django.core.mail import send_mail
 from django.core import signing
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from django.http import Http404
-from .utilis import send_confirmation_email
+from .utilis import send_confirmation_email,send_password_reset_email
 from django.conf import settings
 
 User = get_user_model()
@@ -94,7 +94,76 @@ class EmailConfirmationView(generics.GenericAPIView):
                 return Response({'message': 'User Not Found.'}, status=status.HTTP_400_BAD_REQUEST)
         except BadSignature:
                 return Response({'message': 'Invalid Link.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'message': 'An error occurred.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+
+class PasswordResetRequestView(generics.GenericAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = PasswordResetRequestSerializer
+    
+    def post(self,request):
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         
+        email = serializer.validated_data['email']
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({'message': 'No user found with this email.'}, status=status.HTTP_400_BAD_REQUEST)
+        send_password_reset_email(user,request)
+        
+        return Response({'message': 'Password reset link sent successfully to your email.'}, status=status.HTTP_200_OK)
+    
+class PasswordResetConfirmView(generics.GenericAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = PasswordResetConfirmSerializer
+    
+    def post(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        try:
+            uid = serializer.validated_data['uid']
+            token = serializer.validated_data['token']
+            password = serializer.validated_data['new_password']
+            
+            serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
+            data = serializer.loads(uid, max_age=172800)
+            uid = data['user_id']
+            
+            user = User.objects.get(id=uid)
+            
+            try:
+                email_confirmation = PasswordResetConfirmationToken.objects.get(user=user,token=token)
+                
+                data = serializer.loads(token, max_age=300) 
+                token = data['token']
+                
+                if default_token_generator.check_token(user, token):
+                    email_confirmation.delete()
+                    
+                    user.set_password(password)
+                    user.save()
+                    
+                    return Response({'message': 'Password reset successful.'}, status=status.HTTP_200_OK)
+                else:
+                    return Response({'message': 'Invalid Link.'}, status=status.HTTP_400_BAD_REQUEST)
+            except SignatureExpired:
+                return Response({'message': 'Link has expired.'}, status=status.HTTP_400_BAD_REQUEST)
+            except BadSignature:
+                return Response({'message': 'Invalid Link.'}, status=status.HTTP_400_BAD_REQUEST)
+            except EmailConfirmationToken.DoesNotExist:
+                return Response({'message': 'User Not Found.'}, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            return Response({'message': 'User Not Found.'}, status=status.HTTP_400_BAD_REQUEST)
+        except SignatureExpired:
+                return Response({'message': 'User Not Found.'}, status=status.HTTP_400_BAD_REQUEST)
+        except BadSignature:
+                return Response({'message': 'Invalid Link.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'message': 'An error occurred.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                
 class UserListView(generics.ListAPIView):
     permission_classes = [AllowAny]
     queryset = get_user_model().objects.filter(is_active =True)
@@ -153,5 +222,4 @@ class CommunityListView(generics.ListCreateAPIView):
     serializer_class = CommumitySerializer
     queryset = Community.objects.all()
     permission_classes = [IsStaffOrReadOnly]
-    
     
