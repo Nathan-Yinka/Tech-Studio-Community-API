@@ -11,7 +11,6 @@ class SuperuserUploadForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
     file = forms.FileField()
 
-@user_passes_test(lambda u: u.is_superuser)
 def superuser_upload_view(request):
     duplicate_email = []
     method = ""
