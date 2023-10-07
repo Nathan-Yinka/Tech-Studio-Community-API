@@ -158,12 +158,13 @@ REST_FRAMEWORK = {
     ]
 }
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_BACKEND = "api.backend.EmailBackend"
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND = "api.backend.EmailBackend"
 
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'nathanace12345@gmail.com'
-EMAIL_HOST_PASSWORD = 'rtcvtzkapqxwwejb'
+EMAIL_HOST = 'live.smtp.mailtrap.io'
+EMAIL_HOST_USER = 'api'
+EMAIL_HOST_PASSWORD = '07a34076c8c08abea3025939468388f3'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 # from django.core.mail import send_mail

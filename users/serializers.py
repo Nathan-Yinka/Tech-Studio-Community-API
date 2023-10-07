@@ -1,6 +1,11 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import Community,EmailConfirmationToken
+from PIL import Image
+from resizeimage import resizeimage
+
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,7 +22,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         # Your custom email validation logic here
         # Check if an active user with the same email exists
         if get_user_model().objects.filter(email=value, is_active=True).exists():
-            raise ValidationError('An account with this email address already exists and is active. kfjdjfjjffjk')
+            raise ValidationError('An account with this email address already exists and is active.')
         return value
         
     def create(self, validated_data):
@@ -27,7 +32,23 @@ class CustomUserSerializer(serializers.ModelSerializer):
             user.set_password(password)
         user.save()
         return user
+    
+    def validate_image(self, value):
+        # Custom validation for the uploaded image goes here if needed.
+        # You can also perform resizing here before saving.
 
+        if value:
+            # Resize the image to 200x200 pixels
+            img = Image.open(value)
+            img = resizeimage.resize_thumbnail(img, [400, 400])
+
+            # Save the resized image back to the same field
+            value.seek(0)  # Make sure the file is at the beginning
+            img.save(value, img.format)
+            value.seek(0)  # Reset the file pointer
+
+        return value
+    
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
