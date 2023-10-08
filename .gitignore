@@ -129,3 +129,5 @@ local_settings.py
 
 # production
 settings_production.py
+
+staticfiles/
