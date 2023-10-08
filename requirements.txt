@@ -25,3 +25,4 @@ gunicorn==21.2.0
 django-cors-headers
 dj-database-url==2.1.0
 python-dotenv
+drf-yasg

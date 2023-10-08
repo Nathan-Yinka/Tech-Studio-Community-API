@@ -55,6 +55,7 @@ class UserRegistrationView(generics.CreateAPIView):
    
 class EmailConfirmationView(generics.GenericAPIView):
     permission_classes = [AllowAny]
+    serializer_class = PasswordResetConfirmSerializer
     def get(self, request, uid, token):
         try:
             
