@@ -66,3 +66,10 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     uid = serializers.CharField()
     token = serializers.CharField()
     new_password = serializers.CharField(write_only=True, required=True)
+    
+class EmailConfirmSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    
+class ResendConfirmationEmailSerializer(serializers.Serializer):
+    uid =serializers.CharField()

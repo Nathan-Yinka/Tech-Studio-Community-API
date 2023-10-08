@@ -6,7 +6,7 @@ from . import allowed_users
 app_name = "user"
 urlpatterns = [
     path("register/",views.UserRegistrationView.as_view(), name = "register"),
-    path('confirm-email/<str:uid>/<str:token>/', views.EmailConfirmationView.as_view(), name='confirm-email'),
+    path('confirm-email/', views.EmailConfirmationView.as_view(), name='confirm-email'),
     path("resend-confimation/",views.ResendConfirmationEmailView.as_view(),name="resend-confimation"),
     path("login/",views.UserLoginView.as_view(), name = "user-list"),
     

@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny,IsAuthenticated,IsAdminUser
 from api.permissions import IsOwnerOrReadOnly,IsStaffOrReadOnly
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model,authenticate
-from .serializers import CustomUserSerializer,UserLoginSerializer,CommumitySerializer,PasswordResetRequestSerializer,PasswordResetConfirmSerializer
+from .serializers import CustomUserSerializer,UserLoginSerializer,CommumitySerializer,PasswordResetRequestSerializer,PasswordResetConfirmSerializer,EmailConfirmSerializer,ResendConfirmationEmailSerializer
 from .models import Community,EmailConfirmationToken,AllowedEmail,PasswordResetConfirmationToken
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
@@ -55,9 +55,14 @@ class UserRegistrationView(generics.CreateAPIView):
    
 class EmailConfirmationView(generics.GenericAPIView):
     permission_classes = [AllowAny]
-    serializer_class = PasswordResetConfirmSerializer
-    def get(self, request, uid, token):
+    serializer_class = EmailConfirmSerializer
+    def post(self, request):
         try:
+            serializer = EmailConfirmSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            
+            uid = serializer.validated_data['uid']
+            token = serializer.validated_data['token']
             
             serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
             data = serializer.loads(uid, max_age=172800)
@@ -200,8 +205,9 @@ class UserLoginView(generics.CreateAPIView):
         else:
             return Response({'detail': 'Invalid credentials'}, status=status.HTTP_404_NOT_FOUND)
         
-class ResendConfirmationEmailView(APIView):
+class ResendConfirmationEmailView(generics.GenericAPIView):
     permission_classes = [AllowAny]
+    serializer_class = ResendConfirmationEmailSerializer
     def post(self, request):
         try:
             id = request.data.get('uid')
