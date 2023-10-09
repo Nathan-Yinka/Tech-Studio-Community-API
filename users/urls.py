@@ -18,6 +18,9 @@ urlpatterns = [
     
     path("community/",views.CommunityListView.as_view(), name = "community-list"),
     
+    path('user-follow/', views.UserFollow.as_view(), name='user-follow'),
+    path('user-unfollow/', views.UserUnfollow.as_view(), name='user-unfollow'),
+    
     # user upload endpoint
     path('allowed-users-upload/', allowed_users.superuser_upload_view, name="allowed-users-upload"),
 ]

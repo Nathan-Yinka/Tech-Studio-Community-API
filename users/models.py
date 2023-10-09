@@ -41,7 +41,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(auto_now_add=True)
     community = models.ForeignKey("Community", on_delete=models.SET_NULL, null=True)
     image = models.ImageField(upload_to='user_profile_pic',null=True,blank=True)
-        
+    following = models.ManyToManyField('self',through='Contact',related_name='followers',symmetrical=False)
+       
     groups = models.ManyToManyField(
         Group,
         verbose_name='groups',
@@ -65,7 +66,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
     
     class Meta:
-        unique_together = ('email', 'is_active') 
+        unique_together = ('email', 'is_active')
+        
+        indexes = [
+            models.Index(fields=['id']), 
+        ]
+        ordering = ["id"]
     
 class EmailConfirmationToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -83,7 +89,18 @@ class Community(models.Model):
     def __str__(self):
         return self.name
     
+class Contact(models.Model):
+    user_from = models.ForeignKey('User',related_name='rel_from_set',on_delete=models.CASCADE)   
+    user_to = models.ForeignKey('User',related_name='rel_to_set',on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
     
-    
+    class Meta:
+        indexes = [
+        models.Index(fields=['-created']),
+        ]
+        ordering = ['-created']
+        
+    def __str__(self):
+        return f'{self.user_from} follows {self.user_to}'
     
 

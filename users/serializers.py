@@ -1,22 +1,25 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Community,EmailConfirmationToken
+from .models import Community,EmailConfirmationToken,Contact
 from PIL import Image
 from resizeimage import resizeimage
-
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 class CustomUserSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = get_user_model()
-        fields = ('id', 'email', 'first_name', 'last_name', 'password', 'community', 'image')
+        fields = ('id', 'email', 'first_name', 'last_name', 'password', 'community','full_name', 'image')
         extra_kwargs = {'password': {'write_only': True}}
         error_messages = {
             'email': {
                 'unique': 'A user with this email already exists.cccvvvfdhd'
             }
         }
+    def get_full_name(self, obj):
+        # Combine the first_name and last_name fields to create the full_name
+        return f"{obj.first_name} {obj.last_name}"
         
     def validate_email(self, value):
         # Your custom email validation logic here
@@ -73,3 +76,8 @@ class EmailConfirmSerializer(serializers.Serializer):
     
 class ResendConfirmationEmailSerializer(serializers.Serializer):
     uid =serializers.CharField()
+    
+class FollowUnfollowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contact
+        fields =["user_to"]

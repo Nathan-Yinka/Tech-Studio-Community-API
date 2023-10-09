@@ -6,8 +6,8 @@ from rest_framework.permissions import AllowAny,IsAuthenticated,IsAdminUser
 from api.permissions import IsOwnerOrReadOnly,IsStaffOrReadOnly
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model,authenticate
-from .serializers import CustomUserSerializer,UserLoginSerializer,CommumitySerializer,PasswordResetRequestSerializer,PasswordResetConfirmSerializer,EmailConfirmSerializer,ResendConfirmationEmailSerializer
-from .models import Community,EmailConfirmationToken,AllowedEmail,PasswordResetConfirmationToken
+from .serializers import CustomUserSerializer,UserLoginSerializer,CommumitySerializer,PasswordResetRequestSerializer,PasswordResetConfirmSerializer,EmailConfirmSerializer,ResendConfirmationEmailSerializer,FollowUnfollowSerializer
+from .models import Community,EmailConfirmationToken,AllowedEmail,PasswordResetConfirmationToken,Contact
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
@@ -18,6 +18,10 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from django.http import Http404
 from .utilis import send_confirmation_email,send_password_reset_email
 from django.conf import settings
+from rest_framework.pagination import PageNumberPagination
+from django.db.models import Q
+from api.pagination import MyCustomPagination
+from django.shortcuts import get_object_or_404
 
 User = get_user_model()
 
@@ -174,6 +178,38 @@ class UserListView(generics.ListAPIView):
     permission_classes = [AllowAny]
     queryset = get_user_model().objects.filter(is_active =True)
     serializer_class = CustomUserSerializer
+    pagination_class = MyCustomPagination
+    
+    def list(self, request, *args, **kwargs):
+        # Get the paginated queryset
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # Paginate the queryset
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    def get_queryset(self):
+        queryset = get_user_model().objects.filter(is_active =True)
+
+        search_query = self.request.query_params.get('name', None)
+        tags = self.request.query_params.get('community', None)
+
+        if search_query:
+            queryset = queryset.filter(
+                Q(first_name__icontains=search_query) |
+                Q(last_name__icontains=search_query) |
+                Q(email__icontains=search_query)
+            )
+
+        if tags:
+            queryset = queryset.filter(community__name__icontains=tags)
+        return queryset
     
     
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -230,3 +266,53 @@ class CommunityListView(generics.ListCreateAPIView):
     queryset = Community.objects.all()
     permission_classes = [IsStaffOrReadOnly]
     
+    
+    
+class UserFollow(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = FollowUnfollowSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            user_id = serializer.validated_data['user_to']
+            try:
+                contact, created = Contact.objects.get_or_create(
+                    user_from=request.user,
+                    user_to=user_id)
+
+                if created:
+                    response_data = { 'message': 'Followed'}
+                else:
+                    response_data = { 'message': 'Already following'}
+
+                return Response(response_data,status=status.HTTP_200_OK)
+
+            except User.DoesNotExist:
+                return Response({'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class UserUnfollow(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = FollowUnfollowSerializer
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            user_id = serializer.validated_data['user_to']
+
+            try:
+                Contact.objects.filter(
+                    user_from=request.user,
+                    user_to=user_id).delete()
+
+                return Response({'message': 'Unfollowed'},status=status.HTTP_200_OK)
+
+            except User.DoesNotExist:
+                return Response({'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
