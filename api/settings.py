@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     # install apps
     "jobs.apps.JobsConfig",
     "users.apps.UsersConfig",
+    "notifications.apps.NotificationsConfig",
     'rest_framework.authtoken',
     
     "storages",
@@ -112,9 +113,9 @@ DATABASES = {
 database_url = os.environ.get("DATABASE_URL")
 db_from_env = dj_database_url.config(default=database_url)
 
-DATABASES = {
-    'default': db_from_env
-}
+# DATABASES = {
+#     'default': db_from_env
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -164,7 +165,7 @@ AUTH_USER_MODEL = 'users.User'
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
-        'rest_framework.authentication.TokenAuthentication',
+        "api.authentication.TokenAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
@@ -176,11 +177,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_BACKEND = "api.backend.EmailBackend"
 
-EMAIL_HOST = 'live.smtp.mailtrap.io'
-EMAIL_HOST_USER = 'api'
-EMAIL_HOST_PASSWORD = '07a34076c8c08abea3025939468388f3'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
 # from django.core.mail import send_mail
 # send_mail('Django mail',"This e-mail was sent with Django",'nathanace12345@gmail.com',["oludarenathaniel@gmail.com"],fail_silently=False)
 

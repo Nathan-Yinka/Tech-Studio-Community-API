@@ -65,6 +65,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
     
+    @property
+    def fullname(self):
+        return f"{self.first_name} {self.last_name}"
+    
     class Meta:
         unique_together = ('email', 'is_active')
         

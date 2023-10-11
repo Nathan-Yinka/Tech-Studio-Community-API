@@ -6,11 +6,33 @@ from resizeimage import resizeimage
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
-class CustomUserSerializer(serializers.ModelSerializer):
-    full_name = serializers.SerializerMethodField(read_only=True)
+class FollowerSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('id', 'email', 'first_name', 'last_name', 'password', 'community','full_name', 'image')
+        fields = ('id', 'email', 'first_name', 'last_name','fullname','community', 'image')
+
+class FollowingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ('id', 'email', 'first_name', 'last_name',"fullname", 'community', 'image')
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField(read_only=True)
+    followers_count = serializers.SerializerMethodField(read_only=True)
+    following_count = serializers.SerializerMethodField(read_only=True) 
+    followers = FollowerSerializer(many=True, read_only=True) 
+    following = FollowingSerializer(many=True, read_only=True)  
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            self.fields['is_following'] = serializers.SerializerMethodField(read_only=True)
+            
+    class Meta:
+        model = get_user_model()
+        fields = ('id', 'email', 'first_name', 'last_name', 'password', 'community','full_name', 'image','followers_count', 'following_count','followers', 'following')
         extra_kwargs = {'password': {'write_only': True}}
         error_messages = {
             'email': {
@@ -18,12 +40,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
             }
         }
     def get_full_name(self, obj):
-        # Combine the first_name and last_name fields to create the full_name
         return f"{obj.first_name} {obj.last_name}"
         
     def validate_email(self, value):
-        # Your custom email validation logic here
-        # Check if an active user with the same email exists
         if get_user_model().objects.filter(email=value, is_active=True).exists():
             raise ValidationError('An account with this email address already exists and is active.')
         return value
@@ -37,20 +56,25 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return user
     
     def validate_image(self, value):
-        # Custom validation for the uploaded image goes here if needed.
-        # You can also perform resizing here before saving.
-
         if value:
-            # Resize the image to 200x200 pixels
             img = Image.open(value)
             img = resizeimage.resize_thumbnail(img, [500, 500])
-
-            # Save the resized image back to the same field
-            value.seek(0)  # Make sure the file is at the beginning
+            value.seek(0) 
             img.save(value, img.format)
-            value.seek(0)  # Reset the file pointer
-
+            value.seek(0) 
         return value
+    
+    def get_is_following(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return request.user.following.filter(id=obj.id).exists()
+        return False
+    
+    def get_followers_count(self, obj):
+        return obj.followers.count()
+
+    def get_following_count(self, obj):
+        return obj.following.count()
     
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()

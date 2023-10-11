@@ -30,7 +30,7 @@ def send_confirmation_email(user, request):
             'uid': signed_user_id,
             'token': signed_token,
         }
-        confirmation_link = reverse('user:confirm-email')
+        confirmation_link = reverse('auth:confirm-email')
         confirmation_url = request.build_absolute_uri(confirmation_link)
         confirmation_url = f'{confirmation_url}{signed_user_id}/{signed_token}/'
 
@@ -80,7 +80,7 @@ def send_password_reset_email(user, request):
             'uid': signed_user_id,
             'token': signed_token,
         }
-        password_reset_link = reverse('user:confirm-password-reset')
+        password_reset_link = reverse('auth:confirm-password-reset')
         password_reset_link = request.build_absolute_uri(password_reset_link)
         password_reset_link = f'{password_reset_link}{signed_user_id}/{signed_token}/'
 

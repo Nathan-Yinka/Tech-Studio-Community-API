@@ -22,6 +22,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from api.pagination import MyCustomPagination
 from django.shortcuts import get_object_or_404
+from notifications.utils import create_action
 
 User = get_user_model()
 
@@ -183,7 +184,6 @@ class UserListView(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         # Get the paginated queryset
         queryset = self.filter_queryset(self.get_queryset())
-
         # Paginate the queryset
         page = self.paginate_queryset(queryset)
 
@@ -209,6 +209,10 @@ class UserListView(generics.ListAPIView):
 
         if tags:
             queryset = queryset.filter(community__name__icontains=tags)
+            
+        if self.request.user.is_authenticated:
+            queryset = queryset.exclude(pk=self.request.user.pk)
+            
         return queryset
     
     
@@ -281,8 +285,9 @@ class UserFollow(generics.GenericAPIView):
                 contact, created = Contact.objects.get_or_create(
                     user_from=request.user,
                     user_to=user_id)
-
+                print(user_id.id)
                 if created:
+                    create_action(request.user, 'followed', user_id,user_id)
                     response_data = { 'message': 'Followed'}
                 else:
                     response_data = { 'message': 'Already following'}
