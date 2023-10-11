@@ -8,10 +8,11 @@ from django.db.models import Q
 from django.shortcuts import redirect
 from rest_framework import status
 from .dropdown import deadline_choices,job_type,job_experiences,jobposts_pays
+from rest_framework.permissions import AllowAny
 
 class JobPostViewSet(generics.GenericAPIView):
     queryset = JobPost.objects.all()
-    
+    permission_classes = [AllowAny]
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return JobListSerializer  # Serializer for GET requests with depth
@@ -35,7 +36,7 @@ class JobPostViewSet(generics.GenericAPIView):
 class JobPosterView(generics.GenericAPIView):
     serializer_class = JobPosterSerializer
     queryset = JobPoster.objects.all()
-    
+    permission_classes = [AllowAny]
     def get(self,request):
         jobposters = self.get_queryset()
         serializer = self.get_serializer(jobposters,many=True)
@@ -60,6 +61,7 @@ class JobPosterView(generics.GenericAPIView):
 class SkillCreateView(generics.CreateAPIView):
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
+    permission_classes = [AllowAny]
     
     def perform_create(self, serializer):
         email = serializer.validated_data.get("email")
@@ -80,6 +82,7 @@ class ToolCreateView(generics.CreateAPIView):
         serializer.save(client_created=client_created)
             
 class DropDownItem(APIView):
+    permission_classes = [AllowAny]
     def get(self, request, *args, **kwargs):
         email = request.query_params.get("email")
         skills = Skill.objects.filter(Q(email=None) | Q(email=email))

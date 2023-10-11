@@ -33,10 +33,11 @@ class UserRegistrationView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         email = request.data.get("email")
-        allowed_mail = AllowedEmail.objects.filter(email=email).first()
+        if email:
+            allowed_mail = AllowedEmail.objects.filter(email=email).first()
 
-        if allowed_mail is None:
-            return Response({"message": "You are not allowed to register because you are not an alumnus of Tech Studio Academy."},status=status.HTTP_403_FORBIDDEN)
+            if allowed_mail is None:
+                return Response({"message": "You are not allowed to register because you are not an alumnus of Tech Studio Academy."},status=status.HTTP_403_FORBIDDEN)
 
         existing_user = User.objects.filter(email=email).first()
 
