@@ -173,6 +173,12 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
 
+AUTHENTICATION_BACKENDS = [
+    'api.authentication.CustomAuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_BACKEND = "api.backend.EmailBackend"
