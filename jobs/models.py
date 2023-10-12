@@ -14,27 +14,27 @@ class JobPost(models.Model):
     title = models.CharField(max_length=250)
     location = models.CharField(max_length=250)
     
-    JOB_POST_TYPES = [
-        ("Web Development", "Web Development"),
-        ("Product Design", "Product Design"),
-        ("Data Analysis", "Data Analysis"),
-    ]
+    # JOB_POST_TYPES = [
+    #     ("Web Development", "Web Development"),
+    #     ("Product Design", "Product Design"),
+    #     ("Data Analysis", "Data Analysis"),
+    # ]
     job_type = models.CharField(
         max_length=50,
-        choices=JOB_POST_TYPES,
+        # choices=JOB_POST_TYPES,
         default="Web Development",  # Default job type
     )
     
-    JOB_POST_EXPERIENCES = [
-        ("less than a year", "less than a year"),
-        ("1-2 years", "1-2 years"),
-        ("2-3 years", "2-3 years"),
-        ("3-4 years", "3-4 years"),
-        ("4-5 years", "4-5 years"),
-    ]
+    # JOB_POST_EXPERIENCES = [
+    #     ("less than a year", "less than a year"),
+    #     ("1-2 years", "1-2 years"),
+    #     ("2-3 years", "2-3 years"),
+    #     ("3-4 years", "3-4 years"),
+    #     ("4-5 years", "4-5 years"),
+    # ]
     experience = models.CharField(
         max_length=50,
-        choices=JOB_POST_EXPERIENCES,
+        # choices=JOB_POST_EXPERIENCES,
         default="4-6 months",  # Default experience
     )
     
@@ -42,16 +42,16 @@ class JobPost(models.Model):
     qualification = models.TextField(blank=True,null=True)
     responsibilities = models.TextField(blank=True,null=True)
     
-    JOB_POST_PAYS_CHOICES = [
-        ("150,000-250,000", "150,000-250,000"),
-        ("250,000-350,000", "250,000-350,000"),
-        ("350,000-450,000", "350,000-450,000"),
-        ("450,000-550,000", "450,000-550,000"),
-        ("650,000-750,000", "650,000-750,000"),
-    ]
+    # JOB_POST_PAYS_CHOICES = [
+    #     ("150,000-250,000", "150,000-250,000"),
+    #     ("250,000-350,000", "250,000-350,000"),
+    #     ("350,000-450,000", "350,000-450,000"),
+    #     ("450,000-550,000", "450,000-550,000"),
+    #     ("650,000-750,000", "650,000-750,000"),
+    # ]
     pays_range = models.CharField(
         max_length=100,
-        choices=JOB_POST_PAYS_CHOICES,
+        # choices=JOB_POST_PAYS_CHOICES,
         default="150,000-250,000",  # Default pays range
     )
     
