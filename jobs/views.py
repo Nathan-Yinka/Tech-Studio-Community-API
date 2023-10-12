@@ -73,6 +73,7 @@ class SkillCreateView(generics.CreateAPIView):
 class ToolCreateView(generics.CreateAPIView):
     queryset = Tool.objects.all()
     serializer_class = ToolSerializer
+    permission_classes = [AllowAny]
     
     def perform_create(self, serializer):
         email = serializer.validated_data.get("email")
