@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import JobPost, Skill, Tool,JobPoster
 from datetime import datetime, timedelta
 from django.utils import timezone
-from .dropdown import deadline_choices
+from .dropdown import deadline_choices,deadline_mapping
 
 class SkillSerializer(serializers.ModelSerializer):
     class Meta:
