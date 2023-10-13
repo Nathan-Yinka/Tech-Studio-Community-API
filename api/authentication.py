@@ -3,6 +3,7 @@ from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth import get_user_model
 from rest_framework import exceptions
 User = get_user_model()
+from django.utils.translation import gettext_lazy as _
 
 class TokenAuthentication(BaseTokenAuth):
     keyword = "Bearer"
@@ -19,7 +20,7 @@ class StaffUserTokenAuthentication(TokenAuthentication):
             raise exceptions.AuthenticationFailed(_('User inactive or deleted.'))
 
         if not token.user.is_staff:
-            raise exceptions.AuthenticationFailed(_('User is not a superuser.'))
+            raise exceptions.AuthenticationFailed(_('User is not a Staff.'))
 
         return (token.user, token)
     
