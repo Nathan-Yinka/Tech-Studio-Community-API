@@ -20,6 +20,8 @@ from .utilis import send_confirmation_email,send_password_reset_email
 from django.conf import settings
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
+from django.db.models.functions import Concat
+from django.db.models import F, CharField, Value
 from api.pagination import MyCustomPagination
 from django.shortcuts import get_object_or_404
 from notifications.utils import create_action
@@ -199,17 +201,21 @@ class UserListView(generics.ListAPIView):
         queryset = get_user_model().objects.filter(is_active =True)
 
         search_query = self.request.query_params.get('name', None)
-        tags = self.request.query_params.get('community', None)
+        tag_id = self.request.query_params.get('community', None)
 
         if search_query:
-            queryset = queryset.filter(
-                Q(first_name__icontains=search_query) |
-                Q(last_name__icontains=search_query) |
+            queryset = queryset.annotate(
+                full_name=Concat(
+                    F('first_name'), Value(' '), F('last_name'),
+                    output_field=CharField()
+                )
+            ).filter(
+                Q(full_name__icontains=search_query) |
                 Q(email__icontains=search_query)
             )
 
-        if tags:
-            queryset = queryset.filter(community__name__icontains=tags)
+        if tag_id:
+            queryset = queryset.filter(community__id=tag_id)
             
         if self.request.user.is_authenticated:
             queryset = queryset.exclude(pk=self.request.user.pk)
