@@ -4,14 +4,6 @@ from django.contrib.auth.models import Group, Permission
 import uuid
 from django.utils import timezone
 
-
-class AllowedEmail(models.Model):
-    email = models.EmailField(unique=True)
-    created = models.DateTimeField(default=timezone.now)
-    
-    def __str__(self):
-        return self.email
-
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:

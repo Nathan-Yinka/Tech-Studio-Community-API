@@ -7,7 +7,8 @@ from api.permissions import IsOwnerOrReadOnly,IsStaffOrReadOnly
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model,authenticate
 from .serializers import CustomUserSerializer,UserLoginSerializer,CommumitySerializer,PasswordResetRequestSerializer,PasswordResetConfirmSerializer,EmailConfirmSerializer,ResendConfirmationEmailSerializer,FollowUnfollowSerializer
-from .models import Community,EmailConfirmationToken,AllowedEmail,PasswordResetConfirmationToken,Contact
+from .models import Community,EmailConfirmationToken,PasswordResetConfirmationToken,Contact
+from core.models import AllowedEmail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
@@ -39,7 +40,7 @@ class UserRegistrationView(generics.CreateAPIView):
             allowed_mail = AllowedEmail.objects.filter(email=email).first()
 
             if allowed_mail is None:
-                return Response({"message": "You are not allowed to register because you are not an alumnus of Tech Studio Academy."},status=status.HTTP_403_FORBIDDEN)
+                return Response({"message": "You are not allowed to register because you are not an alumni of Tech Studio Academy."},status=status.HTTP_403_FORBIDDEN)
 
         existing_user = User.objects.filter(email=email).first()
 

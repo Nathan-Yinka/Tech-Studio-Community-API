@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User,Community,EmailConfirmationToken,AllowedEmail,PasswordResetConfirmationToken,Contact
+from .models import User,Community,EmailConfirmationToken,PasswordResetConfirmationToken,Contact
 from django.contrib.auth.admin import UserAdmin
 
 # Register your models here.
@@ -11,7 +11,6 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Community)
-admin.site.register(AllowedEmail)
 admin.site.register(EmailConfirmationToken)
 admin.site.register(PasswordResetConfirmationToken)
 admin.site.register(Contact)

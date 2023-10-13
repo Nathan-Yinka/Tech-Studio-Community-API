@@ -26,4 +26,4 @@ class IsStaffOrReadOnly(permissions.BasePermission):
             return True
 
         # Instance must have an attribute named `owner`.
-        return request.user.is_superuser
+        return request.user.is_staff

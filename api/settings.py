@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "users.apps.UsersConfig",
     "notifications.apps.NotificationsConfig",
     'rest_framework.authtoken',
+    "core.apps.CoreConfig",
     
     "storages",
     "corsheaders",

@@ -1,7 +1,6 @@
 from django.urls import path
 from django.contrib.auth import get_user_model
 from . import views
-from . import allowed_users
 
 app_name = "auth"
 
