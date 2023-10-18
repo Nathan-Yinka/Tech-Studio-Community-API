@@ -219,13 +219,13 @@ STATICFILES_DIRS= [
 ]
 
 
-CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWS_ORIGINS = [
     "http://localhost:5500",
     "https://video-recording-api.onrender.com/videos/",
     "https://helpmeoo.netlify.app/",
     "https://malzahra.tech",
+    "http://localhost:5173"
 ]
 
 CORS_ALLOW_METHODS = [
@@ -244,3 +244,5 @@ CORS_ALLOW_HEADERS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_ALL_ORIGINS = True
