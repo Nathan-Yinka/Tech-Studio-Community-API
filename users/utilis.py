@@ -31,8 +31,9 @@ def send_confirmation_email(user, request):
             'token': signed_token,
         }
         confirmation_link = reverse('auth:confirm-email')
-        confirmation_url = request.build_absolute_uri(confirmation_link)
-        confirmation_url = f'{confirmation_url}{signed_user_id}/{signed_token}/'
+        confirmation_link = "https://tech-studio-community-frontend-ngf7-nathan-yinka.vercel.app/"
+        # confirmation_url = request.build_absolute_uri(confirmation_link)
+        confirmation_url = f'{confirmation_link}{signed_user_id}/{signed_token}/'
 
         # subject = "Confirm Your Email Address"
         # message = f"Click the link below to confirm your email address:\n\n{confirmation_url}"
