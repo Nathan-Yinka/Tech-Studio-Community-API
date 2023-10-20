@@ -10,6 +10,7 @@ urlpatterns = [
     path('<int:pk>/', views.UserDetailView.as_view(), name='user-detail'),
     
     path("community/",views.CommunityListView.as_view(), name = "community-list"),
+    path("community/<int:pk>/",views.CommunityRetrieveView.as_view(), name = "community-retrieve"),
     
     path('follow/', views.UserFollow.as_view(), name='user-follow'),
     path('unfollow/', views.UserUnfollow.as_view(), name='user-unfollow'),

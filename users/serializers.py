@@ -17,6 +17,7 @@ class FollowingSerializer(serializers.ModelSerializer):
         fields = ('id', 'email', 'first_name', 'last_name',"fullname", 'community', 'image')
 
 class CustomUserSerializer(serializers.ModelSerializer):
+    community_name = serializers.SerializerMethodField(read_only=True)
     full_name = serializers.SerializerMethodField(read_only=True)
     followers_count = serializers.SerializerMethodField(read_only=True)
     following_count = serializers.SerializerMethodField(read_only=True) 
@@ -32,7 +33,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
             
     class Meta:
         model = get_user_model()
-        fields = ('id', 'email', 'first_name', 'last_name', 'password', 'community','full_name', 'image','followers_count', 'following_count','followers', 'following')
+        fields = ('id', 'email', 'first_name', 'last_name', 'password', 'community','full_name', 'image','followers_count', 'following_count','followers', 'following',"community_name")
         extra_kwargs = {'password': {'write_only': True}}
         error_messages = {
             'email': {
@@ -54,6 +55,9 @@ class CustomUserSerializer(serializers.ModelSerializer):
             user.set_password(password)
         user.save()
         return user
+    
+    def get_community_name(self, obj):
+        return obj.community.name if obj.community else None
     
     def validate_image(self, value):
         if value:

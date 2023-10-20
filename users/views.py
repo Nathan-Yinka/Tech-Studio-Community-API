@@ -285,6 +285,11 @@ class CommunityListView(generics.ListCreateAPIView):
     queryset = Community.objects.all()
     permission_classes = [IsStaffOrReadOnly]
     
+class CommunityRetrieveView(generics.RetrieveAPIView):
+    serializer_class = CommumitySerializer
+    queryset = Community.objects.all()
+    permission_classes = [IsStaffOrReadOnly]
+    
     
     
 class UserFollow(generics.GenericAPIView):
