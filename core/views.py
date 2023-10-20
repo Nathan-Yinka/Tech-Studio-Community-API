@@ -141,7 +141,7 @@ class AllowEmailView(generics.ListCreateAPIView):
             error_message = {'message': 'Invaild Email'}
             return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
         
-class AllowEmailDetailView(generics.DestroyAPIView):
+class AllowEmailDeleteView(generics.DestroyAPIView):
     queryset = AllowedEmail.objects.all()
     serializer_class = AllowedEmailSerializer
     authentication_classes = [StaffUserTokenAuthentication, StaffUserSessionAuthentication]

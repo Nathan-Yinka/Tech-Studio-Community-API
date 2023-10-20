@@ -224,7 +224,7 @@ class UserListView(generics.ListAPIView):
         return queryset
     
     
-class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+class UserDetailView(generics.RetrieveAPIView):
     queryset = get_user_model().objects.filter(is_active =True)
     serializer_class = CustomUserSerializer
     permission_classes = [IsOwnerOrReadOnly]
@@ -243,7 +243,7 @@ class UserLoginView(generics.CreateAPIView):
         if user is not None and user.is_active:
             user_serializer = UserLoginSerializer(user)
             token, created = Token.objects.get_or_create(user=user)
-            response_data = {'id': user.id,'token': token.key }
+            response_data = {'token': token.key }
             return Response(response_data, status=status.HTTP_200_OK)
         
         elif user is not None and not user.is_active:
@@ -252,6 +252,13 @@ class UserLoginView(generics.CreateAPIView):
         
         else:
             return Response({'detail': 'Invalid credentials'}, status=status.HTTP_404_NOT_FOUND)
+        
+class AuthenticatedUserView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated,IsOwnerOrReadOnly]
+    serializer_class = CustomUserSerializer
+
+    def get_object(self):
+        return self.request.user
         
 class ResendConfirmationEmailView(generics.GenericAPIView):
     permission_classes = [AllowAny]
