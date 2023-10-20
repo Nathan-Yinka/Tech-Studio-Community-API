@@ -82,7 +82,7 @@ def send_password_reset_email(user, request):
             'token': signed_token,
         }
         password_reset_link = reverse('auth:confirm-password-reset')
-        password_reset_link = request.build_absolute_uri(password_reset_link)
+        password_reset_link = "https://techstudiocommunity-nathan-yinka.vercel.app//NewPassword/"
         password_reset_link = f'{password_reset_link}{signed_user_id}/{signed_token}/'
 
         # subject = "Confirm Your Email Address"
