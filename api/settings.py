@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "notifications.apps.NotificationsConfig",
     'rest_framework.authtoken',
     "core.apps.CoreConfig",
+    "feeds.apps.FeedsConfig",
     
     "storages",
     "corsheaders",

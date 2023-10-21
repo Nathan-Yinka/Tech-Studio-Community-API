@@ -44,12 +44,14 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return f"{obj.first_name} {obj.last_name}"
         
     def validate_email(self, value):
-        if get_user_model().objects.filter(email=value, is_active=True).exists():
+        lowercase_email = value.lower()
+        if User.objects.filter(email__iexact=lowercase_email, is_active=True).exists():
             raise ValidationError('An account with this email address already exists and is active.')
-        return value
+        return lowercase_email
         
     def create(self, validated_data):
         password = validated_data.pop('password', None)
+        validated_data['email'] = validated_data['email'].lower()
         user = self.Meta.model(**validated_data)
         if password:
             user.set_password(password)

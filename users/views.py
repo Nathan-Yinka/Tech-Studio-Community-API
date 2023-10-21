@@ -37,12 +37,12 @@ class UserRegistrationView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         email = request.data.get("email")
         if email:
-            allowed_mail = AllowedEmail.objects.filter(email=email).first()
+            allowed_mail = AllowedEmail.objects.filter(email__iexact=email).first()
 
             if allowed_mail is None:
                 return Response({"message": "You are not allowed to register because you are not an alumni of Tech Studio Academy."},status=status.HTTP_403_FORBIDDEN)
 
-        existing_user = User.objects.filter(email=email).first()
+        existing_user = User.objects.filter(email__iexact=email).first()
 
         if existing_user:
             if existing_user.is_active:
@@ -123,7 +123,7 @@ class PasswordResetRequestView(generics.GenericAPIView):
         
         email = serializer.validated_data['email']
         try:
-            user = User.objects.get(email=email)
+            user = User.objects.get(email__iexact=email)
         except User.DoesNotExist:
             return Response({'message': 'No user found with this email.'}, status=status.HTTP_400_BAD_REQUEST)
         send_password_reset_email(user,request)
@@ -237,6 +237,7 @@ class UserLoginView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         email = request.data.get('email')
         password = request.data.get('password')
+        email = email.lower()
 
         user = authenticate(username=email, password=password)
 
