@@ -6,6 +6,11 @@ from resizeimage import resizeimage
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
 class FollowerSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
