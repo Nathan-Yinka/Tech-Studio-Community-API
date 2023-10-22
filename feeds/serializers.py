@@ -12,7 +12,7 @@ User = get_user_model()
 class ProjectCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feed
-        exclude = ["user","likes","total_likes","project","post"]
+        exclude = ["user","likes","total_likes","project","post","views_count"]
         
 class ProjectSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
@@ -24,7 +24,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     tag = CommumitySerializer(read_only=True)
     class Meta:
         model = Feed
-        exclude = ["project","post"]
+        exclude = ["project","post","views_count"]
         
     def get_liked_by_user(self, obj):
         request = self.context.get('request')
@@ -45,7 +45,10 @@ class ProjectSerializer(serializers.ModelSerializer):
     def get_views(self, obj):
         cache_key = f'feed_views_{obj.id}'
         view_count = cache.get(cache_key)
-        return view_count if view_count is not None else 0
+        if view_count is not None:
+            return view_count
+        else:
+            return obj.views_count
     
     def get_created(self, obj):
         return humanize.naturaltime(obj.created)

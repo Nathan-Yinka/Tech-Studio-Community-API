@@ -9,6 +9,8 @@ from api.permissions import IsOwnerOrReadOnly
 from rest_framework.permissions import IsAuthenticatedOrReadOnly,IsAuthenticated
 from django.core.cache import cache
 import hashlib  
+from django.db import transaction
+
 
 # Create your views here.
 class UserProjectsListView(generics.ListAPIView):
@@ -96,30 +98,41 @@ class ProjectRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         else:
             return Response({"message:An Error Occurred"})
         
+    
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-
         cache_key = f'feed_views_{instance.id}'
+
+        
+        views_count = cache.get(cache_key)
+
+        if views_count is None:
+            # View count not found in cache, fetch it from the database
+            views_count = instance.views_count
+
+            # Set the view count in cache for future requests
+            cache.set(cache_key, views_count, 60 * 15)  # Cache for 15 minutes
+
         user_cache_key = None
 
         if request.user.is_authenticated:
+            # Authenticated user: Use their user ID to distinguish views
             user_cache_key = f'user_view_{instance.id}_{request.user.id}'
         else:
-            # For unauthenticated users, create a unique key based on their IP address
+            # Unauthenticated user: Use their IP address to distinguish views
             user_ip = hashlib.md5(request.META['REMOTE_ADDR'].encode()).hexdigest()
-            print(user_ip)
             user_cache_key = f'user_view_{instance.id}_{user_ip}'
-        
-        if not cache.get(cache_key):
-            cache.set(cache_key, 0)
 
         if not cache.get(user_cache_key):
             cache.set(user_cache_key, 1, 60 * 3)
             cache.incr(cache_key) 
-            
-        views_count = cache.get(cache_key)
+
+            with transaction.atomic():
+                instance.views_count += 1
+                instance.save()
 
         return super().retrieve(request, *args, **kwargs)
+
 
 class LikeUnlikeFeedView(generics.CreateAPIView):
     queryset = Feed.objects.all()

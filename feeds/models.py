@@ -45,6 +45,7 @@ class Feed(models.Model):
     project = models.BooleanField(default=False,null=True,blank=True)
     post = models.BooleanField(default=False,null=True,blank=True)
     created = models.DateTimeField(auto_now_add=True)
+    views_count = models.PositiveIntegerField(default=0, blank=True, null=True)
     
     def __str__(self):
         type_str = ""
