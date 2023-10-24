@@ -28,6 +28,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
     following_count = serializers.SerializerMethodField(read_only=True) 
     followers = FollowerSerializer(many=True, read_only=True) 
     following = FollowingSerializer(many=True, read_only=True)  
+    project_number = serializers.SerializerMethodField(read_only=True)
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -38,7 +39,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
             
     class Meta:
         model = get_user_model()
-        fields = ('id', 'email', 'first_name', 'last_name', 'password', 'community','full_name', 'image','followers_count', 'following_count','followers', 'following',"community_name")
+        fields = ('id', 'email', 'first_name', 'last_name', 'password', 'community','full_name', 'image','followers_count', 'following_count','followers', 'following',"community_name","project_number","cohort")
         extra_kwargs = {'password': {'write_only': True}}
         error_messages = {
             'email': {
@@ -86,6 +87,10 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     def get_following_count(self, obj):
         return obj.following.count()
+    
+    def get_project_number(self,obj):
+        feeds = obj.user_feeds.filter(project=True)
+        return feeds.count()
     
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()

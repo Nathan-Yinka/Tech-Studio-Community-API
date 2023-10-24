@@ -14,6 +14,11 @@ class ProjectCreateSerializer(serializers.ModelSerializer):
         model = Feed
         exclude = ["user","likes","total_likes","project","post","views_count"]
         
+class PostCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feed
+        fields = ["description","media_file"]
+        
 class ProjectSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     liked_by_user = serializers.SerializerMethodField(read_only=True)
@@ -57,6 +62,19 @@ class ProjectSerializer(serializers.ModelSerializer):
         created_time = obj.created
         created_date = created_time.strftime("%B %d")
         return created_date
+    
+class PostSerializer(ProjectSerializer):
+    comment_number = serializers.SerializerMethodField(read_only=True)
+    comments = serializers.SerializerMethodField(read_only=True)
+    
+    def get_comment_number(self, obj):
+        return obj.feed_comments.all().count()
+    
+    def get_comments(self, obj):
+        comments = obj.feed_comments.all()
+        comment_serializer = CommentSerializer(comments, many=True)
+        return comment_serializer.data
+    
         
 class FeedLikeUnlikeSerializer(serializers.Serializer):
     feed_id = serializers.IntegerField()
@@ -67,6 +85,11 @@ class CommentCreateSerializer(serializers.ModelSerializer):
         fields = ["text","feed"]
         
 class CommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    created = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Comment
-        fields = "__all__"
+        exclude =["feed"]
+        
+    def get_created(self, obj):
+        return humanize.naturaltime(obj.created)

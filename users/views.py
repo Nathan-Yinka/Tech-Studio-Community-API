@@ -58,7 +58,7 @@ class UserRegistrationView(generics.CreateAPIView):
             # Generate a confirmation token
             send_confirmation_email(user,request)
 
-            return Response({'message': 'Registration successful. Check your email for a confirmation link. \n\n will expire in 5 mintues.'}, status=status.HTTP_201_CREATED)
+            return Response({'message': 'Registration successful. Check your email for a confirmation link. \n\n Link will expire in 5 mintues.'}, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
    
@@ -80,7 +80,7 @@ class EmailConfirmationView(generics.GenericAPIView):
             user = User.objects.get(id=uid)
 
             if user.is_active:
-                return Response({'message': 'Email already confirmed proceed to login page'}, status=status.HTTP_200_OK)
+                return Response({'message': 'Email already confirmed, proceed to login page.'}, status=status.HTTP_200_OK)
             
             try:
                 email_confirmation = EmailConfirmationToken.objects.get(user=user,token=token)

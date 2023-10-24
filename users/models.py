@@ -34,6 +34,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     community = models.ForeignKey("Community", on_delete=models.SET_NULL, null=True)
     image = models.ImageField(upload_to='user_profile_pic',null=True,blank=True)
     following = models.ManyToManyField('self',through='Contact',related_name='followers',symmetrical=False)
+    cohort = models.CharField(max_length=100,null=True,blank=True)
+    bio = models.TextField(blank=True,null=True)
+    linkedln_url = models.CharField(max_length=200,null=True,blank=True)
        
     groups = models.ManyToManyField(
         Group,

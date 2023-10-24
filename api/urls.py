@@ -11,6 +11,7 @@ urlpatterns = [
     path("api/users/",include("users.urls2",namespace= "user")),
     path("api/notifications/",include("notifications.urls",namespace="notification")),
     path("feeds/project/",include("feeds.urls",namespace="project")),
+    path("feeds/post/",include("feeds.urls2",namespace="post")),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
