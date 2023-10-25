@@ -158,7 +158,7 @@ class LikeUnlikeFeedView(generics.CreateAPIView):
 
             feed.save()
 
-            serializer = ProjectSerializer(feed,context={'request': request})
+            serializer = PostSerializer(feed,context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         
         else:
