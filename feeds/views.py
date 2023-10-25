@@ -4,7 +4,7 @@ from rest_framework import status
 from .models import Feed,Comment
 from rest_framework import generics
 from .serializers import ProjectCreateSerializer,ProjectSerializer,FeedLikeUnlikeSerializer,CommentCreateSerializer,PostCreateSerializer,PostSerializer
-from api.pagination import MyCustomPagination
+from api.pagination import MyCustomPagination,MyCustomPagination2
 from api.permissions import IsOwnerOrReadOnly
 from rest_framework.permissions import IsAuthenticatedOrReadOnly,IsAuthenticated
 from django.core.cache import cache
@@ -167,7 +167,7 @@ class LikeUnlikeFeedView(generics.CreateAPIView):
     
 class PostListCreateView(generics.ListCreateAPIView):
     queryset = Feed.objects.filter()
-    pagination_class = MyCustomPagination
+    pagination_class = MyCustomPagination2
     
     def get_serializer_class(self):
         if self.request.method == 'GET':
