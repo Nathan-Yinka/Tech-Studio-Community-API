@@ -14,10 +14,36 @@ class ProjectCreateSerializer(serializers.ModelSerializer):
         model = Feed
         exclude = ["user","likes","total_likes","project","post","views_count"]
         
+    def validate_media_file(self, value):
+        if value:
+            img = Image.open(value)
+            img = resizeimage.resize_thumbnail(img, [400, 400])
+            value.seek(0) 
+            img.save(value, img.format)
+            value.seek(0) 
+        return value
+    def validate_thumbnail(self, value):
+        if value:
+            img = Image.open(value)
+            img = resizeimage.resize_thumbnail(img, [300, 300])
+            value.seek(0) 
+            img.save(value, img.format)
+            value.seek(0) 
+        return value
+        
 class PostCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feed
         fields = ["description","media_file"]
+        
+        def validate_media_file(self, value):
+            if value:
+                img = Image.open(value)
+                img = resizeimage.resize_thumbnail(img, [400, 400])
+                value.seek(0) 
+                img.save(value, img.format)
+                value.seek(0) 
+        
         
 class ProjectSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
