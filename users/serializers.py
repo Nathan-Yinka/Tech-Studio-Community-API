@@ -39,7 +39,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
             
     class Meta:
         model = get_user_model()
-        fields = ('id', 'email', 'first_name', 'last_name', 'password', 'community','full_name', 'image','followers_count', 'following_count','followers', 'following',"community_name","project_number","cohort")
+        fields = ('id', 'email', 'first_name', 'last_name', 'password', 'community','full_name', 'image','followers_count', 'following_count','followers', 'following',"community_name","project_number","cohort","bio","linkedln_url")
         extra_kwargs = {'password': {'write_only': True}}
         error_messages = {
             'email': {
